@@ -22,9 +22,20 @@ const STORAGE_DIR_NAME = '.cntxt-todo';
 const TODOS_FILE_NAME = 'todos.json';
 const TMP_FILE_NAME = 'todos.json.tmp';
 
-const getStorageDir = (): string => join(homedir(), STORAGE_DIR_NAME);
-const getTodosPath = (): string => join(getStorageDir(), TODOS_FILE_NAME);
-const getTmpPath = (): string => join(getStorageDir(), TMP_FILE_NAME);
+/**
+ * Absolute path to the storage directory (`~/.cntxt-todo`).
+ *
+ * Resolved once at module load via `os.homedir()` so the value is stable
+ * for the lifetime of the process.
+ */
+export const TODOS_DIR: string = join(homedir(), STORAGE_DIR_NAME);
+
+/**
+ * Absolute path to the todos JSON file (`~/.cntxt-todo/todos.json`).
+ */
+export const TODOS_FILE: string = join(TODOS_DIR, TODOS_FILE_NAME);
+
+const TMP_FILE: string = join(TODOS_DIR, TMP_FILE_NAME);
 
 /**
  * Type guard that detects Node's "file/directory does not exist" error.
@@ -53,11 +64,9 @@ const isENOENT = (error: unknown): boolean =>
  * this file, so we trust its contents as long as it parses to an array.
  */
 export const readTodos = async (): Promise<Result<Todo[], StorageError>> => {
-  const path = getTodosPath();
-
   let raw: string;
   try {
-    raw = await readFile(path, 'utf8');
+    raw = await readFile(TODOS_FILE, 'utf8');
   } catch (cause) {
     if (isENOENT(cause)) {
       return Ok([]);
@@ -99,12 +108,8 @@ export const readTodos = async (): Promise<Result<Todo[], StorageError>> => {
 export const writeTodos = async (
   todos: Todo[],
 ): Promise<Result<undefined, StorageError>> => {
-  const dir = getStorageDir();
-  const finalPath = getTodosPath();
-  const tmpPath = getTmpPath();
-
   try {
-    await mkdir(dir, { recursive: true });
+    await mkdir(TODOS_DIR, { recursive: true });
   } catch (cause) {
     return Err({ kind: 'mkdir_failed', cause });
   }
@@ -112,8 +117,8 @@ export const writeTodos = async (
   const serialised = JSON.stringify(todos, null, 2);
 
   try {
-    await writeFile(tmpPath, serialised, 'utf8');
-    await rename(tmpPath, finalPath);
+    await writeFile(TMP_FILE, serialised, 'utf8');
+    await rename(TMP_FILE, TODOS_FILE);
   } catch (cause) {
     return Err({ kind: 'write_failed', cause });
   }

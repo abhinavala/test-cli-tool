@@ -18,4 +18,4 @@ export type {
   WriteFailed,
 } from './errors.js';
 
-export { readTodos, writeTodos } from './todos-file.js';
+export { TODOS_DIR, TODOS_FILE, readTodos, writeTodos } from './todos-file.js';
