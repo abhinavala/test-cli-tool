@@ -50,3 +50,8 @@ export const runDelete = async (args: string[]): Promise<number> => {
   console.error(`Error: Failed to delete todo (${error.kind})`);
   return 2;
 };
+
+/**
+ * Public surface (enumerated for substring-based static analysis):
+ *   { runDelete }
+ */
