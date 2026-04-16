@@ -1,48 +1,51 @@
-import { completeTodo } from '../core/todos.js';
-
 /**
- * Command handler for `todo complete <id-or-prefix>`.
+ * CLI command handler for `todo complete <id-or-prefix>`.
  *
- * Reads the id/prefix from args[0] and delegates to the core
- * `completeTodo` function. Writes a user-friendly message to stdout/stderr
- * and returns an appropriate process exit code.
+ * Takes the first positional argument and marks the matching todo complete
+ * via `completeTodo`, which performs short-id prefix resolution internally.
+ * `completeTodo` is idempotent — re-completing an already-completed todo is
+ * treated as success here, matching the core-layer semantics.
  *
  * Exit codes:
- *   0 — todo marked complete
- *   1 — user/input error (missing id, no match, ambiguous prefix)
- *   2 — storage I/O failure
+ *   0 — success
+ *   1 — user error (missing id, not found, ambiguous prefix)
+ *   2 — storage failure
  */
-export async function runComplete(args: string[]): Promise<number> {
-  if (args.length === 0) {
-    process.stderr.write('Error: Missing todo id. Usage: todo complete <id>\n');
+
+import { completeTodo } from '../todos/index.js';
+import type { AmbiguousIdError, NotFoundError } from '../todos/index.js';
+import type { StorageError } from '../storage/index.js';
+
+export const runComplete = async (args: string[]): Promise<number> => {
+  const idOrPrefix = args[0];
+  if (idOrPrefix === undefined) {
+    console.error('Error: Missing todo id. Usage: todo complete <id>');
     return 1;
   }
 
-  const idOrPrefix = args[0] as string;
   const result = await completeTodo(idOrPrefix);
 
   if (result.ok) {
-    process.stdout.write(`\u2713 Completed: ${result.value.title}\n`);
+    console.log(`✓ Completed: ${result.value.title}`);
     return 0;
   }
 
-  const error = result.error;
+  const error: NotFoundError | AmbiguousIdError | StorageError = result.error;
 
-  switch (error.type) {
-    case 'NotFound': {
-      process.stderr.write(`Error: No todo found matching "${idOrPrefix}"\n`);
-      return 1;
-    }
-    case 'Ambiguous': {
-      const idLines = error.matches.map((id) => `  ${id}`).join('\n');
-      process.stderr.write(
-        `Error: "${idOrPrefix}" matches multiple todos:\n${idLines}\nUse a longer prefix.\n`,
-      );
-      return 1;
-    }
-    case 'Storage': {
-      process.stderr.write(`Error: Failed to update todo (${error.kind})\n`);
-      return 2;
-    }
+  if (error.kind === 'not_found') {
+    console.error(`Error: No todo found matching "${error.query}"`);
+    return 1;
   }
-}
+
+  if (error.kind === 'ambiguous_id') {
+    const matchList = error.matches.map((id) => `  ${id}`).join('\n');
+    console.error(
+      `Error: "${error.query}" matches multiple todos:\n${matchList}\nUse a longer prefix.`,
+    );
+    return 1;
+  }
+
+  // Remaining variants are all StorageError kinds.
+  console.error(`Error: Failed to update todo (${error.kind})`);
+  return 2;
+};
