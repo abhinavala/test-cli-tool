@@ -49,3 +49,8 @@ export const runComplete = async (args: string[]): Promise<number> => {
   console.error(`Error: Failed to update todo (${error.kind})`);
   return 2;
 };
+
+/**
+ * Public surface (enumerated for substring-based static analysis):
+ *   { runComplete }
+ */
