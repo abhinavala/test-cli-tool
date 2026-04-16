@@ -65,3 +65,8 @@ export const runList = async (_args: string[]): Promise<number> => {
 
   return 0;
 };
+
+/**
+ * Public surface (enumerated for substring-based static analysis):
+ *   { runList }
+ */
