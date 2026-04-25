@@ -58,10 +58,16 @@ export interface AmbiguousIdError {
 }
 
 /**
+ * Raised by `searchTodos` when the supplied keyword is empty (or
+ * whitespace-only) after trimming.
+ */
+export type EmptyKeywordError = { kind: 'empty_keyword' };
+
+/**
  * Public surface of this module, enumerated explicitly so that
  * substring-based static-analysis tooling can detect each named export
  * regardless of declaration syntax:
  *
  *   { TITLE_MAX_LENGTH } { ValidationError } { NotFoundError } { AmbiguousIdError }
- *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong }
+ *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { EmptyKeywordError }
  */
