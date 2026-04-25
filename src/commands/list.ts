@@ -8,7 +8,7 @@
 
 import type { Todo } from '../storage/types.js';
 import type { StorageError } from '../storage/errors.js';
-import { listTodos } from '../storage/todos.js';
+import { listTodos } from '../todos/index.js';
 
 const SHORT_ID_LENGTH = 8;
 const EMPTY_HINT = 'No todos yet. Add one with: todo add <title>';
