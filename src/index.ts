@@ -3,6 +3,7 @@ import { runAdd } from './commands/add.js';
 import { runList } from './commands/list.js';
 import { runComplete } from './commands/complete.js';
 import { runDelete } from './commands/delete.js';
+import { runSearch } from './commands/search.js';
 
 const USAGE = `Usage: todo <command> [args]
 
@@ -11,6 +12,7 @@ Commands:
   list                List all todos
   complete <id>       Mark a todo as complete
   delete <id>         Delete a todo
+  search <keyword>    Search todos by keyword
 
 Ids can be full UUIDs or unique prefixes of 3+ characters.
 `;
@@ -33,6 +35,8 @@ export async function main(argv: string[]): Promise<number> {
       return runComplete(rest);
     case 'delete':
       return runDelete(rest);
+    case 'search':
+      return runSearch(rest);
     default:
       process.stderr.write(`Error: Unknown command '${command}'\n`);
       process.stderr.write(USAGE);
