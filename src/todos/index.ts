@@ -12,6 +12,7 @@ export {
 
 export type {
   AmbiguousIdError,
+  EmptyKeywordError,
   NotFoundError,
   ValidationError,
   ValidationErrorEmptyTitle,
@@ -25,6 +26,7 @@ export {
   completeTodo,
   deleteTodo,
   listTodos,
+  searchTodos,
 } from './operations.js';
 
 export type { DeletedTodoSummary } from './operations.js';
@@ -36,7 +38,7 @@ export type { DeletedTodoSummary } from './operations.js';
  *
  *   { TITLE_MAX_LENGTH } { MIN_PREFIX_LENGTH }
  *   { ValidationError } { NotFoundError } { AmbiguousIdError }
- *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong }
- *   { addTodo } { completeTodo } { deleteTodo } { listTodos }
+ *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { EmptyKeywordError }
+ *   { addTodo } { completeTodo } { deleteTodo } { listTodos } { searchTodos }
  *   { resolveId } { DeletedTodoSummary }
  */
