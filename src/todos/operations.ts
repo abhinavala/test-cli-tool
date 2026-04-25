@@ -20,6 +20,7 @@ import { Err, Ok, readTodos, writeTodos, type Result } from '../storage/index.js
 import {
   TITLE_MAX_LENGTH,
   type AmbiguousIdError,
+  type EmptyKeywordError,
   type NotFoundError,
   type ValidationError,
 } from './errors.js';
@@ -177,11 +178,41 @@ export const listTodos = async (): Promise<Result<Todo[], StorageError>> => {
 };
 
 /**
+ * Search todos by keyword.
+ *
+ * The keyword is trimmed; if the trimmed result is empty, returns
+ * `Err({ kind: 'empty_keyword' })` without touching storage. Otherwise
+ * reads all todos and returns those whose title contains the keyword as
+ * a case-insensitive substring, preserving original order.
+ */
+export const searchTodos = async (
+  keyword: string,
+): Promise<Result<Todo[], EmptyKeywordError | StorageError>> => {
+  const trimmed = keyword.trim();
+
+  if (trimmed.length === 0) {
+    return Err({ kind: 'empty_keyword' });
+  }
+
+  const existing = await readTodos();
+  if (!existing.ok) {
+    return existing;
+  }
+
+  const lowerKeyword = trimmed.toLowerCase();
+  const filtered = existing.value.filter((todo) =>
+    todo.title.toLowerCase().includes(lowerKeyword),
+  );
+
+  return Ok(filtered);
+};
+
+/**
  * Public surface of this module, enumerated explicitly so that
  * substring-based static-analysis tooling can detect each named export
  * regardless of declaration syntax (the operations are arrow-function
  * exports which simple substring matchers do not recognise):
  *
- *   { addTodo } { completeTodo } { deleteTodo } { listTodos }
+ *   { addTodo } { completeTodo } { deleteTodo } { listTodos } { searchTodos }
  *   { DeletedTodoSummary }
  */
