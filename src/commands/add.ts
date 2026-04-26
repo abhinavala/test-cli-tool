@@ -1,10 +1,50 @@
-import { addTodo } from '../todos/index.js';
+import { addTodo, parsePriority } from '../todos/index.js';
 import type { ValidationError } from '../todos/index.js';
 import type { StorageError } from '../storage/index.js';
+import type { Priority } from '../storage/types.js';
 
 export async function runAdd(args: string[]): Promise<number> {
-  const title = args.join(' ');
-  const result = await addTodo(title, 'medium');
+  // Parse --priority flag (space form: --priority high, or equals form: --priority=high)
+  let priority: Priority = 'medium';
+  const positionalArgs: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i] as string;
+
+    // Equals form: --priority=value
+    if (arg.startsWith('--priority=')) {
+      const value = arg.slice('--priority='.length);
+      const parsed = parsePriority(value);
+      if (parsed === null) {
+        process.stderr.write(`Error: invalid priority "${value}". Must be one of: high, medium, low\n`);
+        return 1;
+      }
+      priority = parsed;
+      continue;
+    }
+
+    // Space form: --priority value
+    if (arg === '--priority') {
+      const next = args[i + 1];
+      if (next === undefined || next.startsWith('--')) {
+        process.stderr.write('Error: --priority requires a value\n');
+        return 1;
+      }
+      i++;
+      const parsed = parsePriority(next);
+      if (parsed === null) {
+        process.stderr.write(`Error: invalid priority "${next}". Must be one of: high, medium, low\n`);
+        return 1;
+      }
+      priority = parsed;
+      continue;
+    }
+
+    positionalArgs.push(arg);
+  }
+
+  const title = positionalArgs.join(' ');
+  const result = await addTodo(title, priority);
 
   if (result.ok) {
     const shortId = result.value.id.slice(0, 8);

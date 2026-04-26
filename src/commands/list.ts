@@ -23,10 +23,17 @@ const EMPTY_HINT = 'No todos yet. Add one with: todo add <title>';
  * lowercase `x` is used (not a Unicode checkmark) so output renders
  * correctly in any terminal or when piped through other tools.
  */
+const PRIORITY_INDICATOR: Record<string, string> = {
+  high: '[H]',
+  medium: '[M]',
+  low: '[L]',
+};
+
 const formatTodoLine = (todo: Todo): string => {
   const checkbox = todo.completed ? '[x]' : '[ ]';
   const shortId = todo.id.slice(0, SHORT_ID_LENGTH);
-  return `${checkbox} ${shortId}  ${todo.title}`;
+  const priority = PRIORITY_INDICATOR[todo.priority] ?? '[M]';
+  return `${checkbox} ${shortId}  ${priority} ${todo.title}`;
 };
 
 /**
