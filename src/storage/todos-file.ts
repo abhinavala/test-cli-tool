@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 import type { StorageError } from './errors.js';
 import { Err, Ok, type Result } from './result.js';
-import type { Todo } from './types.js';
+import { PRIORITIES, type Priority, type Todo } from './types.js';
 
 const STORAGE_DIR_NAME = '.cntxt-todo';
 const TODOS_FILE_NAME = 'todos.json';
@@ -88,7 +88,15 @@ export const readTodos = async (): Promise<Result<Todo[], StorageError>> => {
     });
   }
 
-  return Ok(parsed as Todo[]);
+  const normalized = (parsed as unknown[]).map((item) => {
+    const raw = item as Record<string, unknown>;
+    const priority: Priority = PRIORITIES.includes(raw['priority'] as Priority)
+      ? (raw['priority'] as Priority)
+      : 'medium';
+    return { ...raw, priority } as Todo;
+  });
+
+  return Ok(normalized);
 };
 
 /**

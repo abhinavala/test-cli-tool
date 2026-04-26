@@ -5,6 +5,9 @@
  * JSON-safe with no revival step required on read.
  */
 
+export type Priority = 'high' | 'medium' | 'low';
+export const PRIORITIES: readonly Priority[] = ['high', 'medium', 'low'] as const;
+
 /**
  * A single todo item.
  *
@@ -14,6 +17,7 @@
  * - `createdAt`: ISO 8601 timestamp of when the todo was created.
  * - `completedAt`: ISO 8601 timestamp of when it was completed, or `null`
  *   if the todo has not yet been completed.
+ * - `priority`: the urgency level of the todo.
  */
 export interface Todo {
   id: string;
@@ -21,4 +25,5 @@ export interface Todo {
   completed: boolean;
   createdAt: string;
   completedAt: string | null;
+  priority: Priority;
 }

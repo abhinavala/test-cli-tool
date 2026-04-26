@@ -16,8 +16,11 @@ export type {
   NotFoundError,
   ValidationError,
   ValidationErrorEmptyTitle,
+  ValidationErrorInvalidPriority,
   ValidationErrorTitleTooLong,
 } from './errors.js';
+
+export { parsePriority } from './priority.js';
 
 export { MIN_PREFIX_LENGTH, resolveId } from './resolve-id.js';
 
@@ -38,7 +41,9 @@ export type { DeletedTodoSummary } from './operations.js';
  *
  *   { TITLE_MAX_LENGTH } { MIN_PREFIX_LENGTH }
  *   { ValidationError } { NotFoundError } { AmbiguousIdError }
- *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { EmptyKeywordError }
+ *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { ValidationErrorInvalidPriority }
+ *   { EmptyKeywordError }
+ *   { parsePriority }
  *   { addTodo } { completeTodo } { deleteTodo } { listTodos } { searchTodos }
  *   { resolveId } { DeletedTodoSummary }
  */

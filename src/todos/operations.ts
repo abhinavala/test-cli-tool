@@ -14,6 +14,7 @@
 import { randomUUID } from 'node:crypto';
 
 import type { StorageError, Todo } from '../storage/index.js';
+import type { Priority } from '../storage/types.js';
 
 import { Err, Ok, readTodos, writeTodos, type Result } from '../storage/index.js';
 
@@ -41,6 +42,7 @@ import { resolveId } from './resolve-id.js';
  */
 export const addTodo = async (
   title: string,
+  priority: Priority,
 ): Promise<Result<Todo, ValidationError | StorageError>> => {
   const trimmed = title.trim();
 
@@ -63,6 +65,7 @@ export const addTodo = async (
     completed: false,
     createdAt: new Date().toISOString(),
     completedAt: null,
+    priority,
   };
 
   const written = await writeTodos([...existing.value, todo]);

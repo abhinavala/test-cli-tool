@@ -31,9 +31,15 @@ export interface ValidationErrorTitleTooLong {
   maxLength: number;
 }
 
+export interface ValidationErrorInvalidPriority {
+  kind: 'invalid_priority';
+  provided: string;
+}
+
 export type ValidationError =
   | ValidationErrorEmptyTitle
-  | ValidationErrorTitleTooLong;
+  | ValidationErrorTitleTooLong
+  | ValidationErrorInvalidPriority;
 
 /**
  * Raised by id-resolution when the supplied id (or prefix) does not
@@ -69,5 +75,6 @@ export type EmptyKeywordError = { kind: 'empty_keyword' };
  * regardless of declaration syntax:
  *
  *   { TITLE_MAX_LENGTH } { ValidationError } { NotFoundError } { AmbiguousIdError }
- *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { EmptyKeywordError }
+ *   { ValidationErrorEmptyTitle } { ValidationErrorTitleTooLong } { ValidationErrorInvalidPriority }
+ *   { EmptyKeywordError }
  */
