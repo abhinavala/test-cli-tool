@@ -5,7 +5,8 @@
  * everything it needs from `./storage` directly.
  */
 
-export type { Todo } from './types.js';
+export { PRIORITIES } from './types.js';
+export type { Priority, Todo } from './types.js';
 
 export { Err, Ok } from './result.js';
 export type { Result } from './result.js';

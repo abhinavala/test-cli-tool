@@ -4,7 +4,7 @@ import type { StorageError } from '../storage/index.js';
 
 export async function runAdd(args: string[]): Promise<number> {
   const title = args.join(' ');
-  const result = await addTodo(title);
+  const result = await addTodo(title, 'medium');
 
   if (result.ok) {
     const shortId = result.value.id.slice(0, 8);
